@@ -5,7 +5,7 @@ BUILDDIR = build
 TOOLSDIR = tools
 
 # location of alibvr
-ALIBVR = alibvr
+ALIBVR = ../alibvr/src
 # type of atmega chip
 ATMEGA = atmega328
 
@@ -34,7 +34,7 @@ CXXFLAGS_COMMON += -Wall -Wno-unused-function
 CXXFLAGS_COMMON += -mcall-prologues -mmcu=$(ATMEGA)
 CXXFLAGS_COMMON += -fno-threadsafe-statics -std=c++11 -fwhole-program
 
-CXXFLAGS_DEBUG   = -g3 -O1 $(CXXFLAGS_COMMON)
+CXXFLAGS_DEBUG   = -g3 $(CXXFLAGS_COMMON)
 CXXFLAGS_RELEASE = -g -Os $(CXXFLAGS_COMMON)
 
 
@@ -81,9 +81,6 @@ debug : .all
 $(BUILDDIR)/%.o : $(SOURCEDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
-$(BUILDDIR)/%.obj : $(BUILDDIR)/%.o
-	$(CC) $(CFLAGS) $< -o $@
-
 $(BUILDDIR)/%.elf : $(BUILDDIR)/%.o
 	$(CC) $(CFLAGS) $< -o $@
 
@@ -97,7 +94,7 @@ $(BUILDDIR)/%.s : $(BUILDDIR)/%.o
 	$(OBJDUMP) -S --disassemble $< > $@
 
 clean :
-	rm -f $(BUILDDIR)/$(TARGETS:%=%.o) $(BUILDDIR)/$(TARGETS:%=%.obj) $(BUILDDIR)/$(TARGETS:%=%.s) $(BUILDDIR)/*.sch~ $(BUILDDIR)/gschem.log $(BUILDDIR)/*.S~ $(BUILDDIR)/*.hex $(BUILDDIR)/*.map $(BUILDDIR)/*.eep
+	rm -f $(TARGETS:%=$(BUILDDIR)/%.o) $(TARGETS:%=$(BUILDDIR)/%.s) $(BUILDDIR)/*.sch~ $(BUILDDIR)/gschem.log $(BUILDDIR)/*.S~ $(BUILDDIR)/*.hex $(BUILDDIR)/*.map $(BUILDDIR)/*.eep
 
 clobber : clean
 	rm -f $(TARGETS:%=$(BUILDDIR)/%.hex) $(TARGETS:%=$(BUILDDIR)/%.ps) $(TARGETS:%=$(BUILDDIR)/%.eep)
