@@ -8,36 +8,37 @@
 
 typedef PIN_D6 Led;
 
-struct DisplayTmp {
-  static uint8_t is_enabled() { return true; }
+template <typename T>
+static void display_temp(const T& result16) {
+  const uint8_t result = result16;
   
-  static void adc_complete(const uint8_t result) {
-    const auto mvFor25Degree = 314;
-    const uint8_t adcFor25Degree = mvFor25Degree * (255 / 1100);
-    Led::PORT = result > adcFor25Degree;
-  };
-};
+  const auto mvFor25Degree = 314;
+  const uint8_t adcFor25Degree = mvFor25Degree * (255 / 1100);
   
+  Led::PORT = result > adcFor25Degree;
+}
 
 
 
 // First define the Adc.
-// We want continuous conversion.
+// In our main loop an adc will be started every 100ms.
 // We will then update an output pin in our adc IRQ handler routine,
-typedef Adc<_adc::Ref::V1_1, _adc::Input::Temperature, _adc::Mode::FreeRunning, DisplayTmp> AdcTmp;
-#define NEW_ADC AdcTmp
+typedef Adc<_adc::Ref::V1_1, _adc::Input::Temperature, _adc::Mode::SingleConversion, display_temp> AdcTemp;
+#define NEW_ADC AdcTemp
 #include REGISTER_ADC
 
 
 __attribute__ ((OS_main)) int main(void) {
   // put Led pin into output mode.
   Led::DDR = 1;
-  AdcTmp::init();
+  AdcTemp::init();
   sei();
   
-  AdcTmp::start_adc_8bit();
+  AdcTemp::start_adc_8bit();
   
   for (;;) {
+    _delay_ms(100);
+    AdcTemp::start_adc_8bit();
   }
   return 0;
 }
