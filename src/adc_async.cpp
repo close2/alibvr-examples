@@ -21,9 +21,10 @@ static void display_temp(const T& result16) {
 
 
 // First define the Adc.
-// In our main loop an adc will be started every 100ms.
-// We will then update an output pin in our adc IRQ handler routine,
-typedef Adc<_adc::Ref::V1_1, _adc::Input::Temperature, _adc::Mode::SingleConversion, display_temp> AdcTemp;
+// Whenever an adc is finished the IRQ will call our display_temp function.
+// Because we chose FreeRunning the adc will continously measure the temperature
+// and generate IRQ events.
+typedef Adc<_adc::Ref::V1_1, _adc::Input::Temperature, _adc::Mode::FreeRunning, display_temp> AdcTemp;
 #define NEW_ADC AdcTemp
 #include REGISTER_ADC
 
@@ -37,8 +38,6 @@ __attribute__ ((OS_main)) int main(void) {
   AdcTemp::start_adc_8bit();
   
   for (;;) {
-    _delay_ms(100);
-    AdcTemp::start_adc_8bit();
   }
   return 0;
 }
