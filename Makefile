@@ -1,5 +1,5 @@
 # name of your main code file without the .c / .cpp suffix
-TARGETS ?= adc_sync adc_async adc_sync_3inputs
+TARGETS ?= adc_sync adc_async adc_sync_3inputs led
 SOURCEDIR = src
 BUILDDIR = build
 TOOLSDIR = tools
